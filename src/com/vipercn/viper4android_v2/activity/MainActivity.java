@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 getPrefs("").edit().putBoolean("viper4android.headphonefx.fireq.enable", isChecked).commit();
                 if (TextUtils.isEmpty(getPrefs("").getString("viper4android.headphonefx.fireq.custom", ""))
                     && TextUtils.isEmpty(getPrefs("").getString("viper4android.headphonefx.fireq", ""))) {
+                    getPrefs("").edit().putBoolean("viper4android.headphonefx.fireq.enable", isChecked).commit();
                     getPrefs("").edit().putString("viper4android.headphonefx.fireq.custom", "4.5;4.5;3.5;1.2;1.0;0.5;1.4;1.75;3.5;2.5;").commit();
                     getPrefs("").edit().putString("viper4android.headphonefx.fireq", "4.5;4.5;3.5;1.2;1.0;0.5;1.4;1.75;3.5;2.5;").commit();
                 }
@@ -283,7 +284,7 @@ public class MainActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Shortcut";
+                    return "Mixer";
                 case 1:
                     return "Online";
             }

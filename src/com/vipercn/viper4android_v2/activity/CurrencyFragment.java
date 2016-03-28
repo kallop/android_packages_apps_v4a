@@ -1,29 +1,26 @@
 package com.vipercn.viper4android_v2.activity;
 
+import android.app.*;
 import android.content.*;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
 import com.vipercn.viper4android_v2.R;
+import com.vipercn.viper4android_v2.widget.Gallery;
 
-public class CurrencyFragment extends Fragment implements MyAdapter.OnRecyclerViewItemClickListener {
+public class CurrencyFragment extends Fragment {
 
-    private RecyclerView mRecyclerView;
-    private ShortcutAdapter mShortcutAdapter;
+    private Gallery mEqGallery;
+
+    private MainActivity mLauncher;
+    private MainDSPScreen mFragment;
 
     private String[] mEqualizerPreset;
     private String[] mEqualizerPresetValues;
-
-    private int[] mPicDataset = {R.drawable.pic_common_style_bg_01, R.drawable.pic_common_style_bg_02, R.drawable.pic_common_style_bg_10, R.drawable.pic_common_style_bg_03, R.drawable.pic_common_style_bg_04, R.drawable.pic_common_style_bg_05, R.drawable.pic_common_style_bg_07, R.drawable.pic_common_style_bg_06};
-
-    private MainActivity mLauncher;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -31,25 +28,28 @@ public class CurrencyFragment extends Fragment implements MyAdapter.OnRecyclerVi
 
         mLauncher = (MainActivity) getContext();
 
-        // setup equalizer presets
+        FragmentManager fragmentManager = mLauncher.getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        mFragment = new MainDSPScreen();
+        fragmentTransaction.add(R.id.contentPanel, mFragment);
+        fragmentTransaction.commit();
+
+        mEqGallery = (Gallery) view.findViewById(R.id.eqPresets);
         mEqualizerPreset = getContext().getResources().getStringArray(R.array.equalizer_preset_modes);
         mEqualizerPresetValues = getContext().getResources().getStringArray(R.array.equalizer_preset_values);
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
-        mRecyclerView.setHasFixedSize(true);
-        GridLayoutManager mLayoutManager = new GridLayoutManager(getContext(), 2);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mShortcutAdapter = new ShortcutAdapter(getContext(), mEqualizerPreset, mPicDataset);
-        mRecyclerView.setAdapter(mShortcutAdapter);
-        mAdapter.setOnItemClickListener(this);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), R.layout.equalizer_presets,
+                mEqualizerPreset);
+        mEqGallery.setAdapter(adapter);
+        mEqGallery.setSelection(mLauncher.getPrefs("settings").getInt("home.sound.select", 0));
+        mEqGallery.setOnItemSelectedListener(new Gallery.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(int position) {
+                mLauncher.getPrefs("settings").edit().putInt("home.sound.select", position).commit();
+                mLauncher.getPrefs("").edit().putString("viper4android.headphonefx.fireq.custom", mEqualizerPresetValues[position]).commit();
+                mLauncher.getPrefs("").edit().putString("viper4android.headphonefx.fireq", mEqualizerPresetValues[position]).commit();
+            }
+        });
+        mEqGallery.setEnabled(true);
         return view;
-    }
-
-    @Override
-    public void onItemClick(View view, int Position) {
-        mLauncher.getPrefs("settings").edit().putInt("home.sound.select", Position).commit();
-        mLauncher.getPrefs("").edit().putString("viper4android.headphonefx.fireq.custom", mEqualizerPresetValues[Position]).commit();
-        mLauncher.getPrefs("").edit().putString("viper4android.headphonefx.fireq", mEqualizerPresetValues[Position]).commit();
-        getContext().sendBroadcast(new Intent(ViPER4Android.ACTION_UPDATE_PREFERENCES));
-        mAdapter.notifyDataSetChanged();
     }
 }

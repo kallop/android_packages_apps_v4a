@@ -49,7 +49,7 @@ public class EqualizerPreference extends DialogPreference {
         }
     }
 
-    private void updateListEqualizerFromValue() {
+    public void updateListEqualizerFromValue() {
         String value = getPersistedString(null);
         if (value != null && mListEqualizer != null) {
             String[] levelsStr = value.split(";");
@@ -125,9 +125,7 @@ public class EqualizerPreference extends DialogPreference {
     @Override
     protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
         String value = restorePersistedValue ? getPersistedString(null) : (String) defaultValue;
-        if (shouldPersist()) {
-            persistString(value);
-        }
+        persistString(value);
     }
 
     public void refreshFromPreference() {
