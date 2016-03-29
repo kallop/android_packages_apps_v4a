@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
@@ -26,12 +27,17 @@ import android.view.ViewGroup;
 
 import android.widget.*;
 
+import java.util.ArrayList;
+
 import com.vipercn.viper4android_v2.R;
 import com.vipercn.viper4android_v2.service.ViPER4AndroidService;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ViPER4AndroidService mAudioServiceInstance;
+    private ViPER4AndroidService mViPER4AndroidService;
+    private CurrencyFragment mCurrencyFragment;
+    private FragmentTransaction mFragmentTransaction;
+    private ArrayList<Fragment> Fragments;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -61,6 +67,23 @@ public class MainActivity extends AppCompatActivity {
 
     private Switch mToggleSwitch;
 
+    private boolean mItemSelected = false;
+
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            final String action = intent.getAction();
+            if (action.equals(ViPER4AndroidService.ACTION_UPDATE_ALL_UI)) {
+                for (int i = 0; i < DEFAULT_AUDIO_DEVICES.length; i++) {
+                     if (mViPER4AndroidService.getAudioOutputRouting().equals(DEFAULT_AUDIO_DEVICES[i])) {
+                         setSelection(i);
+                         break;
+                     }
+                }
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,7 +104,11 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        mCurrencyFragment = new CurrencyFragment();
+        Fragments = new ArrayList<Fragment>();
+        Fragments.add(mCurrencyFragment);
+        Fragments.add(PlaceholderFragment.newInstance(2));
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), Fragments);
 
         mSpinner = (Spinner) findViewById(R.id.device);
         String[] Devices = new String[DEFAULT_AUDIO_DEVICES.length];
@@ -95,7 +122,9 @@ public class MainActivity extends AppCompatActivity {
              public void onItemSelected(AdapterView parent, View view, int position, long id) {
                  TextView v1 = (TextView) view;
                  v1.setTextColor(Color.WHITE);
+                 mItemSelected = true;
                  setSelection(position);
+                 mSectionsPagerAdapter.notifyDataSetChanged();
              }
 
              @Override
@@ -148,24 +177,27 @@ public class MainActivity extends AppCompatActivity {
         ServiceConnection connection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder binder) {
-                ViPER4AndroidService service = ((ViPER4AndroidService.LocalBinder)binder).getService();
-                mAudioServiceInstance = service;
-                String routing = ViPER4AndroidService.getAudioOutputRouting(getSharedPreferences(
-                        SHARED_PREFERENCES_BASENAME + ".settings", MODE_PRIVATE));
+                mViPER4AndroidService = ((ViPER4AndroidService.LocalBinder)binder).getService();
+                String routing = mViPER4AndroidService.getAudioOutputRouting();
                 for (int i = 0; i < DEFAULT_AUDIO_DEVICES.length; i++) {
                      if (routing.equals(DEFAULT_AUDIO_DEVICES[i])) {
                          setSelection(i);
                          break;
                      }
                 }
-                unbindService(this);
             }
 
             @Override
-            public void onServiceDisconnected(ComponentName name) {}
+            public void onServiceDisconnected(ComponentName name) {
+                mViPER4AndroidService = null;
+            }
         };
         Intent serviceIntent = new Intent(this, ViPER4AndroidService.class);
         bindService(serviceIntent, connection, Context.BIND_IMPORTANT);
+
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ViPER4AndroidService.ACTION_UPDATE_ALL_UI);
+        registerReceiver(mReceiver, intentFilter);
     }
 
     @Override
@@ -210,7 +242,6 @@ public class MainActivity extends AppCompatActivity {
         mCurrentSelectedPosition = Position;
         mSpinner.setSelection(mCurrentSelectedPosition);
         String config = DEFAULT_AUDIO_DEVICES[mCurrentSelectedPosition];
-        SharedPreferences prefSettings = getSharedPreferences(SHARED_PREFERENCES_BASENAME + "." + localizeDeviceConfig(mCurrentSelectedPosition), 0);
         mToggleSwitch.setChecked(getPrefs("").getBoolean("viper4android.global.forceenable.enable", false)
               && getPrefs("").getBoolean(localizeDeviceOnConfig(mCurrentSelectedPosition), false));
     }
@@ -259,25 +290,34 @@ public class MainActivity extends AppCompatActivity {
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        private ArrayList<Fragment> fragments;
+        private FragmentManager fm;
+
+        public SectionsPagerAdapter(FragmentManager fm, ArrayList<Fragment> fragments) {
             super(fm);
+            this.fm = fm;
+            this.fragments = fragments;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Fragment fm = (fragments.get(position)); super.instantiateItem(container, position);
+            return fm;
         }
 
         @Override
         public Fragment getItem(int position) {
-            switch (position) {
-                case 0:
-                    return new CurrencyFragment();
-                case 1:
-                    return PlaceholderFragment.newInstance(position + 1);
-            }
-            return null;
+            return fragments.get(position);
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
-            return 2;
+            return fragments.size();
         }
 
         @Override

@@ -740,8 +740,7 @@ public final class ViPER4Android extends Activity {
 
                 ViPER4AndroidService service = ((ViPER4AndroidService.LocalBinder)binder).getService();
                 mAudioServiceInstance = service;
-                String routing = ViPER4AndroidService.getAudioOutputRouting(getSharedPreferences(
-                        SHARED_PREFERENCES_BASENAME + ".settings", MODE_PRIVATE));
+                String routing = service.getAudioOutputRouting();
                 if (mIsTabbed && viewPager != null) {
                     String[] entries = getEntries();
                     for (int i = 0; i < entries.length; i++) {

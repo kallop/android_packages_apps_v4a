@@ -17,7 +17,9 @@ public class CurrencyFragment extends Fragment {
     private Gallery mEqGallery;
 
     private MainActivity mLauncher;
+
     private MainDSPScreen mFragment;
+    private FragmentTransaction mFragmentTransaction;
 
     private String[] mEqualizerPreset;
     private String[] mEqualizerPresetValues;
@@ -29,10 +31,9 @@ public class CurrencyFragment extends Fragment {
         mLauncher = (MainActivity) getContext();
 
         FragmentManager fragmentManager = mLauncher.getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        mFragmentTransaction = fragmentManager.beginTransaction();
         mFragment = new MainDSPScreen();
-        fragmentTransaction.add(R.id.contentPanel, mFragment);
-        fragmentTransaction.commit();
+        updataFragment();
 
         mEqGallery = (Gallery) view.findViewById(R.id.eqPresets);
         mEqualizerPreset = getContext().getResources().getStringArray(R.array.equalizer_preset_modes);
@@ -40,16 +41,23 @@ public class CurrencyFragment extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), R.layout.equalizer_presets,
                 mEqualizerPreset);
         mEqGallery.setAdapter(adapter);
+        mEqGallery.setCallbackDuringFling(false);
         mEqGallery.setSelection(mLauncher.getPrefs("settings").getInt("home.sound.select", 0));
         mEqGallery.setOnItemSelectedListener(new Gallery.OnItemSelectedListener() {
             @Override
             public void onItemSelected(int position) {
-                mLauncher.getPrefs("settings").edit().putInt("home.sound.select", position).commit();
-                mLauncher.getPrefs("").edit().putString("viper4android.headphonefx.fireq.custom", mEqualizerPresetValues[position]).commit();
-                mLauncher.getPrefs("").edit().putString("viper4android.headphonefx.fireq", mEqualizerPresetValues[position]).commit();
+                 mLauncher.getPrefs("settings").edit().putInt("home.sound.select", position).commit();
+                 mLauncher.getPrefs("").edit().putString("viper4android.headphonefx.fireq.custom", mEqualizerPresetValues[position]).commit();
+                 mLauncher.getPrefs("").edit().putString("viper4android.headphonefx.fireq", mEqualizerPresetValues[position]).commit();
             }
         });
         mEqGallery.setEnabled(true);
         return view;
+    }
+
+    public void updataFragment() {
+        if (!mFragment.isAdded()) {
+            mFragmentTransaction.add(R.id.contentPanel, mFragment).commit();
+        }
     }
 }

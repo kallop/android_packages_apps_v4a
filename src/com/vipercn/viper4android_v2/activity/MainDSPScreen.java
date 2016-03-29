@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -25,22 +26,16 @@ public final class MainDSPScreen extends PreferenceFragment {
 
     private MainActivity mLauncher;
 
+    private EqualizerPreference mEqualizerPreference;
+
     private final OnSharedPreferenceChangeListener listener
             = new OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-            Log.i("ViPER4Android", "Update key = " + key);
-
-            /* Now tell the equalizer that it must display something else. */
-            EqualizerPreference eq = (EqualizerPreference) findPreference(PREF_KEY_CUSTOM_EQ);
-            eq.updateListEqualizerFromValue();
-            eq = null;
-
             if (PREF_KEY_DDC.equals(key)) {
                 if (prefs.getBoolean(key, false)) {
-                    SharedPreferences prefSettings = getActivity().getSharedPreferences(ViPER4Android.SHARED_PREFERENCES_BASENAME + ".settings", 0);
-                    if (!prefSettings.getBoolean("viper4android.settings.viperddc.notice", false)) {
-                    	prefSettings.edit().putBoolean("viper4android.settings.viperddc.notice", true).commit();
+                    if (!mLauncher.getPrefs("settings").getBoolean("viper4android.settings.viperddc.notice", false)) {
+                    	mLauncher.getPrefs("settings").edit().putBoolean("viper4android.settings.viperddc.notice", true).commit();
 	                    AlertDialog.Builder mNotice = new AlertDialog.Builder(getActivity());
 	                    mNotice.setTitle("ViPER4Android");
 	                    mNotice.setMessage(getActivity().getResources().getString(
@@ -50,15 +45,13 @@ public final class MainDSPScreen extends PreferenceFragment {
 	                    mNotice.show();
 	                    mNotice = null;
                     }
-                    prefSettings = null;
                 }
             }
 
             if (PREF_KEY_VSE.equals(key)) {
                 if (prefs.getBoolean(key, false)) {
-                    SharedPreferences prefSettings = getActivity().getSharedPreferences(ViPER4Android.SHARED_PREFERENCES_BASENAME + ".settings", 0);
-                    if (!prefSettings.getBoolean("viper4android.settings.vse.notice", false)) {
-                    	prefSettings.edit().putBoolean("viper4android.settings.vse.notice", true).commit();
+                    if (!mLauncher.getPrefs("settings").getBoolean("viper4android.settings.vse.notice", false)) {
+                    	mLauncher.getPrefs("settings").edit().putBoolean("viper4android.settings.vse.notice", true).commit();
 	                    AlertDialog.Builder mNotice = new AlertDialog.Builder(getActivity());
 	                    mNotice.setTitle("ViPER4Android");
 	                    mNotice.setMessage(getActivity().getResources().getString(
@@ -68,9 +61,11 @@ public final class MainDSPScreen extends PreferenceFragment {
 	                    mNotice.show();
 	                    mNotice = null;
                     }
-                    prefSettings = null;
                 }
             }
+            mEqualizerPreference = (EqualizerPreference) findPreference(PREF_KEY_CUSTOM_EQ);
+            mEqualizerPreference.updateListEqualizerFromValue();
+            mEqualizerPreference = null;
             getActivity().sendBroadcast(new Intent(ViPER4Android.ACTION_UPDATE_PREFERENCES));
         }
     };
@@ -84,18 +79,11 @@ public final class MainDSPScreen extends PreferenceFragment {
         String config = mLauncher.localizeDeviceConfig(mLauncher.mCurrentSelectedPosition);
         PreferenceManager prefManager = getPreferenceManager();
 
-        SharedPreferences prefSettings = getActivity().getSharedPreferences(
-                ViPER4Android.SHARED_PREFERENCES_BASENAME + ".settings", 0);
-        int mControlLevel = prefSettings.getInt("viper4android.settings.uiprefer", 0);
-        if (mControlLevel < 0 || mControlLevel > 2) {
-            mControlLevel = 0;
-        }
-
         prefManager.setSharedPreferencesName(
                 ViPER4Android.SHARED_PREFERENCES_BASENAME + "." + config);
         prefManager.setSharedPreferencesMode(Context.MODE_MULTI_PROCESS);
         try {
-            int xmlId = R.xml.class.getField(config + "_preferences_l" + mControlLevel)
+            int xmlId = R.xml.class.getField(config + "_preferences")
                     .getInt(null);
             addPreferencesFromResource(xmlId);
         } catch (Exception e) {

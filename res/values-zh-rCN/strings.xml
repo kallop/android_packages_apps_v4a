@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ViPER4Android FX</string>
+    <string name="app_name">音调</string>
     <string name="select_configuration_title">ViPER4Android FX</string>
     <string name="headset_title">耳机</string>
     <string name="speaker_title">扬声器</string>

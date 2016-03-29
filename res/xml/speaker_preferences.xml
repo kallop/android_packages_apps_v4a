@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="@string/pref_spkfx_master_title">
-        <SwitchPreference android:title="@string/pref_dsp_enable" android:key="viper4android.speakerfx.enable" android:summaryOn="@string/pref_spkfx_master_summary_on" android:summaryOff="@string/pref_spkfx_master_summary_off" android:disableDependentsState="false" />
-        <SwitchPreference android:title="@string/pref_force_enable_text" android:key="viper4android.global.forceenable.enable" android:disableDependentsState="false" />
-    </PreferenceCategory>
-    <PreferenceCategory android:title="@string/pref_equalizer_title">
-        <SwitchPreference android:title="@string/pref_equalizer_enable" android:key="viper4android.headphonefx.fireq.enable" android:summaryOn="@string/pref_equalizer_summary_on" android:summaryOff="@string/pref_equalizer_summary_off" android:disableDependentsState="false" />
-        <com.vipercn.viper4android_v2.preference.SummariedListPreference android:entries="@array/equalizer_preset_modes" android:title="@string/pref_equalizer_preset_title" android:key="viper4android.headphonefx.fireq" android:defaultValue="0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;" android:dialogTitle="@string/pref_equalizer_preset_title" android:entryValues="@array/equalizer_preset_values" />
-        <com.vipercn.viper4android_v2.preference.EqualizerPreference android:key="viper4android.headphonefx.fireq.custom" />
-    </PreferenceCategory>
+    <com.vipercn.viper4android_v2.preference.EqualizerPreference android:key="viper4android.headphonefx.fireq.custom" />
     <PreferenceCategory android:title="@string/pref_convolver_title">
         <SwitchPreference android:title="@string/pref_convolver_enable" android:key="viper4android.headphonefx.convolver.enable" android:summaryOn="@string/pref_convolver_summary_on" android:summaryOff="@string/pref_convolver_summary_off" android:disableDependentsState="false" />
         <com.vipercn.viper4android_v2.preference.SummariedListPreferenceWithCustom android:title="@string/pref_convolver_knl" android:key="viper4android.headphonefx.convolver.kernel" android:defaultValue="" android:dialogTitle="@string/pref_convolver_knl_title" />
