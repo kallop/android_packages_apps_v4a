@@ -35,9 +35,8 @@ import com.vipercn.viper4android_v2.service.ViPER4AndroidService;
 public class MainActivity extends AppCompatActivity {
 
     private ViPER4AndroidService mViPER4AndroidService;
+
     private CurrencyFragment mCurrencyFragment;
-    private FragmentTransaction mFragmentTransaction;
-    private ArrayList<Fragment> Fragments;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -50,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     private ArrayAdapter<String> mDeviceAdapter;
+
+    private ArrayList<Fragment> Fragments;
+
     public final String[] DEFAULT_AUDIO_DEVICES = new String[]{
             "headset", "speaker", "bluetooth", "usb"
     };
@@ -66,8 +68,6 @@ public class MainActivity extends AppCompatActivity {
     private Spinner mSpinner;
 
     private Switch mToggleSwitch;
-
-    private boolean mItemSelected = false;
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -122,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
              public void onItemSelected(AdapterView parent, View view, int position, long id) {
                  TextView v1 = (TextView) view;
                  v1.setTextColor(Color.WHITE);
-                 mItemSelected = true;
                  setSelection(position);
                  mSectionsPagerAdapter.notifyDataSetChanged();
              }
@@ -291,11 +290,9 @@ public class MainActivity extends AppCompatActivity {
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         private ArrayList<Fragment> fragments;
-        private FragmentManager fm;
 
         public SectionsPagerAdapter(FragmentManager fm, ArrayList<Fragment> fragments) {
             super(fm);
-            this.fm = fm;
             this.fragments = fragments;
         }
 

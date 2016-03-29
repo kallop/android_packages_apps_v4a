@@ -46,9 +46,9 @@ public class CurrencyFragment extends Fragment {
         mEqGallery.setOnItemSelectedListener(new Gallery.OnItemSelectedListener() {
             @Override
             public void onItemSelected(int position) {
-                 mLauncher.getPrefs("settings").edit().putInt("home.sound.select", position).commit();
-                 mLauncher.getPrefs("").edit().putString("viper4android.headphonefx.fireq.custom", mEqualizerPresetValues[position]).commit();
-                 mLauncher.getPrefs("").edit().putString("viper4android.headphonefx.fireq", mEqualizerPresetValues[position]).commit();
+                mLauncher.getPrefs("settings").edit().putInt("home.sound.select", position).commit();
+                mLauncher.getPrefs("").edit().putString("viper4android.headphonefx.fireq.custom", mEqualizerPresetValues[position]).commit();
+                mLauncher.getPrefs("").edit().putString("viper4android.headphonefx.fireq", mEqualizerPresetValues[position]).commit();
             }
         });
         mEqGallery.setEnabled(true);

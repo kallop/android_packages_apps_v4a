@@ -1139,7 +1139,6 @@ public class ViPER4AndroidService extends Service {
         private boolean mUseBluetooth;
         private boolean mUseHeadset;
         private boolean mUseUSB;
-        private boolean mUseWifiDisplay;
         private boolean mUseSpeaker;
 
         private final Context mContext;

@@ -2,7 +2,7 @@
 <resources>
     <string name="empty" />
     <string name="app_name">ToneFX</string>
-    <string name="select_configuration_title">ViPER4Android FX</string>
+    <string name="select_configuration_title">ToneFX</string>
     <string name="headset_title">Headset</string>
     <string name="speaker_title">Phone Speaker</string>
     <string name="bluetooth_title">Bluetooth Device</string>
