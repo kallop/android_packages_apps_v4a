@@ -38,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ViPER4AndroidService mViPER4AndroidService;
 
-    private CurrencyFragment mCurrencyFragment;
+    private MixerFragment mMixerFragment;
+    private OnlineFragment mOnlineFragment;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -108,11 +109,11 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mCurrencyFragment = new CurrencyFragment();
-        PlaceholderFragment mPlaceholderFragment = new PlaceholderFragment();
+        mMixerFragment = new MixerFragment();
+        mOnlineFragment = new OnlineFragment();
         Fragments = new ArrayList<Fragment>();
-        Fragments.add(mCurrencyFragment);
-        Fragments.add(mPlaceholderFragment);
+        Fragments.add(mMixerFragment);
+        Fragments.add(mOnlineFragment);
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), Fragments);
 
         mSpinner = (Spinner) findViewById(R.id.device);
@@ -324,7 +325,8 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            Fragment fm = (fragments.get(position)); super.instantiateItem(container, position);
+            Fragment fm = (fragments.get(position));
+            super.instantiateItem(container, position);
             return fm;
         }
 
@@ -352,21 +354,6 @@ public class MainActivity extends AppCompatActivity {
                     return "Online";
             }
             return null;
-        }
-    }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText("Actively preparing");
-            return rootView;
         }
     }
 }

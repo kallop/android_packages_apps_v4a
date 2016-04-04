@@ -12,7 +12,7 @@ import android.widget.ArrayAdapter;
 import com.vipercn.viper4android_v2.R;
 import com.vipercn.viper4android_v2.widget.Gallery;
 
-public class CurrencyFragment extends Fragment {
+public class MixerFragment extends Fragment {
 
     private Gallery mEqGallery;
 
@@ -26,7 +26,7 @@ public class CurrencyFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.currency_main, container, false);
+        View view = inflater.inflate(R.layout.mixer_main, container, false);
 
         mLauncher = (MainActivity) getContext();
 

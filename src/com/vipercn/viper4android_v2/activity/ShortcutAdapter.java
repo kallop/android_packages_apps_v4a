@@ -10,14 +10,16 @@ import android.widget.TextView;
 import android.util.Log;
 
 import com.vipercn.viper4android_v2.R;
+import com.vipercn.viper4android_v2.misc.ItemInfo;
+
+import java.util.LinkedList;
 
 public class ShortcutAdapter extends RecyclerView.Adapter implements View.OnClickListener {
-    private String[] mEqualizerPreset;
-    private int[] mPicDataset;
+    private LinkedList<ItemInfo> mData;
 
     private int mSelect;
 
-    private Context context;
+    private Context mContext;
 
     private OnRecyclerViewItemClickListener mOnItemClickListener = null;
 
@@ -42,10 +44,9 @@ public class ShortcutAdapter extends RecyclerView.Adapter implements View.OnClic
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public ShortcutAdapter(Context mContext, String[] myDataset, int[] myPicDataset) {
-        context = mContext;
-        mEqualizerPreset = myDataset;
-        mPicDataset = myPicDataset;
+    public ShortcutAdapter(Context context, LinkedList<ItemInfo> data) {
+        mContext = context;
+        mData = data;
         mLauncher = (MainActivity) context;
     }
 
@@ -53,7 +54,7 @@ public class ShortcutAdapter extends RecyclerView.Adapter implements View.OnClic
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         // create a new view
-        LayoutInflater inflater = LayoutInflater.from(context);
+        LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = inflater.inflate(R.layout.item, viewGroup, false);
         view.setOnClickListener(this);
         return new viewHolder(view);
@@ -77,16 +78,16 @@ public class ShortcutAdapter extends RecyclerView.Adapter implements View.OnClic
         // - replace the contents of the view with that element
         viewHolder holder = (viewHolder) viewHolder;
         holder.itemView.setTag(i);
-        holder.nameTv.setText(mEqualizerPreset[i]);
-        holder.picTv.setBackgroundResource(mPicDataset[i]);
-        mSelect = mLauncher.getPrefs("settings").getInt("home.sound.select", 0);
-        if (i == mSelect) holder.accept.setVisibility(View.VISIBLE);
-        else holder.accept.setVisibility(View.GONE);
+        holder.nameTv.setText(mData.get(i).getUser());
+        //holder.picTv.setBackgroundResource(mPicDataset[i]);
+        //mSelect = mLauncher.getPrefs("settings").getInt("home.sound.select", 0);
+        //if (i == mSelect) holder.accept.setVisibility(View.VISIBLE);
+        //else holder.accept.setVisibility(View.GONE);
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return mEqualizerPreset.length;
+        return mData.size();
     }
 }
