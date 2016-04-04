@@ -27,7 +27,7 @@ import com.vipercn.viper4android_v2.activity.DDCDatabase;
 import com.vipercn.viper4android_v2.activity.IRSUtils;
 import com.vipercn.viper4android_v2.activity.Utils;
 import com.vipercn.viper4android_v2.activity.V4AJniInterface;
-import com.vipercn.viper4android_v2.activity.ViPER4Android;
+import com.vipercn.viper4android_v2.activity.MainActivity;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -108,8 +108,7 @@ public class ViPER4AndroidService extends Service {
                     @Override
                     public void onEnableStatusChange(AudioEffect effect, boolean enabled) {
                         String mode = getAudioOutputRouting();
-                        SharedPreferences preferences = getSharedPreferences(
-                                ViPER4Android.SHARED_PREFERENCES_BASENAME + "." + mode, 0);
+                        SharedPreferences preferences = getSharedPreferences(MainActivity.SHARED_PREFERENCES_BASENAME + "." + mode, 0);
                         String mEnableKey = "viper4android.headphonefx.enable";
                         if (mode.equalsIgnoreCase("speaker")) {
                             mEnableKey = "viper4android.speakerfx.enable";
@@ -868,7 +867,7 @@ public class ViPER4AndroidService extends Service {
 
             String mode = getAudioOutputRouting();
             SharedPreferences preferences = getSharedPreferences(
-                    ViPER4Android.SHARED_PREFERENCES_BASENAME + "." + mode, 0);
+                    MainActivity.SHARED_PREFERENCES_BASENAME + "." + mode, 0);
             boolean mEqEnabled = preferences.getBoolean(
                     "viper4android.headphonefx.fireq.enable", false);
             itResult.putExtra("equalizer_enabled", mEqEnabled);
@@ -992,7 +991,7 @@ public class ViPER4AndroidService extends Service {
             Log.i("ViPER4Android", "mAudioSessionReceiver::onReceive()");
 
             SharedPreferences prefSettings = getSharedPreferences(
-                    ViPER4Android.SHARED_PREFERENCES_BASENAME + ".settings", MODE_PRIVATE);
+                    MainActivity.SHARED_PREFERENCES_BASENAME + ".settings", MODE_PRIVATE);
             String mCompatibleMode = prefSettings.getString(
                     "viper4android.settings.compatiblemode", "global");
             boolean mFXInLocalMode = !mCompatibleMode.equals("global");
@@ -1088,7 +1087,7 @@ public class ViPER4AndroidService extends Service {
 
     private void showNotification(String mFXType) {
         SharedPreferences preferences = getSharedPreferences(
-                ViPER4Android.SHARED_PREFERENCES_BASENAME + ".settings", MODE_PRIVATE);
+                MainActivity.SHARED_PREFERENCES_BASENAME + ".settings", MODE_PRIVATE);
         boolean enableNotify = preferences.getBoolean(
                 "viper4android.settings.show_notify_icon", false);
         if (!enableNotify) {
@@ -1100,7 +1099,7 @@ public class ViPER4AndroidService extends Service {
                 getApplicationInfo().packageName);
         String mNotifyText = "ViPER4Android FX " + mFXType;
         CharSequence contentTitle = "ViPER4Android FX";
-        Intent notificationIntent = new Intent(this, ViPER4Android.class);
+        Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent contentItent = PendingIntent.getActivity(
                 this, 0, notificationIntent, 0);
 
@@ -1227,7 +1226,7 @@ public class ViPER4AndroidService extends Service {
             String mDriverVersion = iaDrvVer[0] + "." + iaDrvVer[1] + "." + iaDrvVer[2] + "."
                     + iaDrvVer[3];
             aeuUtils = null;
-            if (!ViPER4Android.isDriverCompatible(mDriverVersion)) {
+            if (!MainActivity.isDriverCompatible(mDriverVersion)) {
             	Log.i("ViPER4Android", "ViPER4Android engine is not compatible with service");
             	mDriverIsReady = false;
             	return;
@@ -1262,7 +1261,7 @@ public class ViPER4AndroidService extends Service {
         }
 
         SharedPreferences prefSettings = getSharedPreferences(
-                ViPER4Android.SHARED_PREFERENCES_BASENAME + ".settings", 0);
+                MainActivity.SHARED_PREFERENCES_BASENAME + ".settings", 0);
         boolean mDriverConfigured = prefSettings.getBoolean(
                 "viper4android.settings.driverconfigured", false);
         if (!mDriverConfigured) {
@@ -1286,9 +1285,6 @@ public class ViPER4AndroidService extends Service {
         }
         prefSettings = null;
 
-        if (Build.VERSION.SDK_INT < 18)
-            startForeground(ViPER4Android.NOTIFY_FOREGROUND_ID, new Notification());
-
         IntentFilter audioSessionFilter = new IntentFilter();
         audioSessionFilter.addAction(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION);
         audioSessionFilter.addAction(AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION);
@@ -1296,10 +1292,7 @@ public class ViPER4AndroidService extends Service {
         registerReceiver(mAudioSessionReceiver, audioSessionFilter);
 
         registerReceiver(mPreferenceUpdateReceiver,
-                new IntentFilter(ViPER4Android.ACTION_UPDATE_PREFERENCES));
-        registerReceiver(mShowNotifyReceiver, new IntentFilter(ViPER4Android.ACTION_SHOW_NOTIFY));
-        registerReceiver(mCancelNotifyReceiver,
-                new IntentFilter(ViPER4Android.ACTION_CANCEL_NOTIFY));
+                new IntentFilter(MainActivity.ACTION_UPDATE_PREFERENCES));
 
         /******************** 3rd API Interface ********************/
         registerReceiver(m3rdAPI_QUERY_DRIVERSTATUS_Receiver,
@@ -1336,8 +1329,6 @@ public class ViPER4AndroidService extends Service {
 
         unregisterReceiver(mAudioSessionReceiver);
         unregisterReceiver(mPreferenceUpdateReceiver);
-        unregisterReceiver(mShowNotifyReceiver);
-        unregisterReceiver(mCancelNotifyReceiver);
 
         /******************** 3rd API Interface ********************/
         unregisterReceiver(m3rdAPI_QUERY_DRIVERSTATUS_Receiver);
@@ -1347,8 +1338,6 @@ public class ViPER4AndroidService extends Service {
         unregisterReceiver(m3rdAPI_SET_ENABLED_Receiver);
         unregisterReceiver(m3rdAPI_SET_EQUALIZER_Receiver);
         /***********************************************************/
-
-        cancelNotification();
 
         if (mGeneralFX != null)
             mGeneralFX.release();
@@ -1385,7 +1374,7 @@ public class ViPER4AndroidService extends Service {
         }
 
         SharedPreferences prefSettings = getSharedPreferences(
-                ViPER4Android.SHARED_PREFERENCES_BASENAME + ".settings", 0);
+                MainActivity.SHARED_PREFERENCES_BASENAME + ".settings", 0);
         String mCompatibleMode = prefSettings
                 .getString("viper4android.settings.compatiblemode", "global");
         if (!mCompatibleMode.equalsIgnoreCase("global")) {
@@ -1618,7 +1607,7 @@ public class ViPER4AndroidService extends Service {
     void updateSystem(boolean mRequireReset) {
         String mode = getAudioOutputRouting();
         SharedPreferences preferences = getSharedPreferences(
-                ViPER4Android.SHARED_PREFERENCES_BASENAME + "." + mode, 0);
+                MainActivity.SHARED_PREFERENCES_BASENAME + "." + mode, 0);
         Log.i("ViPER4Android", "Begin system update(" + mode + ")");
 
         int mFXType = V4A_FX_TYPE_HEADPHONE;
@@ -1642,7 +1631,7 @@ public class ViPER4AndroidService extends Service {
         }
 
         SharedPreferences prefSettings = getSharedPreferences(
-                ViPER4Android.SHARED_PREFERENCES_BASENAME + ".settings", MODE_PRIVATE);
+                MainActivity.SHARED_PREFERENCES_BASENAME + ".settings", MODE_PRIVATE);
         String mCompatibleMode = prefSettings
                 .getString("viper4android.settings.compatiblemode", "global");
         boolean mFXInLocalMode;

@@ -28,9 +28,11 @@ import android.view.ViewGroup;
 import android.widget.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.vipercn.viper4android_v2.R;
 import com.vipercn.viper4android_v2.service.ViPER4AndroidService;
+import com.vipercn.viper4android_v2.widget.Gallery;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
      * may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
+    public SectionsPagerAdapter mSectionsPagerAdapter;
 
     private ArrayAdapter<String> mDeviceAdapter;
 
@@ -58,7 +60,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
     public int mCurrentSelectedPosition;
 
-    public final String SHARED_PREFERENCES_BASENAME = "com.vipercn.viper4android_v2";
+    public static final String SHARED_PREFERENCES_BASENAME = "com.vipercn.viper4android_v2";
+
+    public static final String ACTION_UPDATE_PREFERENCES = "com.vipercn.viper4android_v2.UPDATE";
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -105,9 +109,10 @@ public class MainActivity extends AppCompatActivity {
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mCurrencyFragment = new CurrencyFragment();
+        PlaceholderFragment mPlaceholderFragment = new PlaceholderFragment();
         Fragments = new ArrayList<Fragment>();
         Fragments.add(mCurrencyFragment);
-        Fragments.add(PlaceholderFragment.newInstance(2));
+        Fragments.add(mPlaceholderFragment);
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), Fragments);
 
         mSpinner = (Spinner) findViewById(R.id.device);
@@ -129,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
              @Override
              public void onNothingSelected(AdapterView parent) {}
         });
+
         if (savedInstanceState != null) {
             mCurrentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
         }
@@ -148,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
                     getPrefs("").edit().putString("viper4android.headphonefx.fireq.custom", "4.5;4.5;3.5;1.2;1.0;0.5;1.4;1.75;3.5;2.5;").commit();
                     getPrefs("").edit().putString("viper4android.headphonefx.fireq", "4.5;4.5;3.5;1.2;1.0;0.5;1.4;1.75;3.5;2.5;").commit();
                 }
-                sendBroadcast(new Intent(ViPER4Android.ACTION_UPDATE_PREFERENCES));
+                sendBroadcast(new Intent(ACTION_UPDATE_PREFERENCES));
             }
         });
 
@@ -205,6 +211,26 @@ public class MainActivity extends AppCompatActivity {
         outState.putInt(STATE_SELECTED_POSITION, mCurrentSelectedPosition);
     }
 
+    public static boolean isDriverCompatible(String szDrvVersion){
+    	List<String> lstCompatibleList = new ArrayList<String>();
+    	// TODO: <DO NOT REMOVE> add compatible driver version to lstCompatibleList
+
+    	if (lstCompatibleList.contains(szDrvVersion)) {
+    		lstCompatibleList.clear();
+    		lstCompatibleList = null;
+    		return true;
+    	} else {
+    		lstCompatibleList.clear();
+    		lstCompatibleList = null;
+    		// Since we cant use getPackageManager in static method, we need to type the current version here
+    		// TODO: <DO NOT REMOVE> please make sure this string equals to current apk's version
+    		if (szDrvVersion.equals("2.3.4.0")) {
+    			return true;
+    		}
+    		return false;
+    	}
+    }
+
     private boolean checkDDCDBVer() {
         PackageManager packageMgr = getPackageManager();
         PackageInfo packageInfo;
@@ -237,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
         return getSharedPreferences(SHARED_PREFERENCES_BASENAME + "." + (TextUtils.isEmpty(more) ? localizeDeviceConfig(mCurrentSelectedPosition) : more), 0);
     }
 
-    private void setSelection(int Position) {
+    public void setSelection(int Position) {
         mCurrentSelectedPosition = Position;
         mSpinner.setSelection(mCurrentSelectedPosition);
         String config = DEFAULT_AUDIO_DEVICES[mCurrentSelectedPosition];
@@ -253,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
         return DEFAULT_AUDIO_DEVICES[Position];
     }
 
-    private final String localizeDevice(String device) {
+    public final String localizeDevice(String device) {
         return getString(getResources().getIdentifier(device + "_title", "string", getPackageName()));
     }
 
@@ -333,33 +359,13 @@ public class MainActivity extends AppCompatActivity {
      * A placeholder fragment containing a simple view.
      */
     public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        public PlaceholderFragment() {
-        }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            textView.setText("Actively preparing");
             return rootView;
         }
     }

@@ -65,7 +65,7 @@ public final class MainDSPScreen extends PreferenceFragment {
             mEqualizerPreference = (EqualizerPreference) findPreference(PREF_KEY_CUSTOM_EQ);
             mEqualizerPreference.updateListEqualizerFromValue();
             mEqualizerPreference = null;
-            getActivity().sendBroadcast(new Intent(ViPER4Android.ACTION_UPDATE_PREFERENCES));
+            getActivity().sendBroadcast(new Intent(MainActivity.ACTION_UPDATE_PREFERENCES));
         }
     };
 
@@ -79,7 +79,7 @@ public final class MainDSPScreen extends PreferenceFragment {
         PreferenceManager prefManager = getPreferenceManager();
 
         prefManager.setSharedPreferencesName(
-                ViPER4Android.SHARED_PREFERENCES_BASENAME + "." + config);
+                MainActivity.SHARED_PREFERENCES_BASENAME + "." + config);
         prefManager.setSharedPreferencesMode(Context.MODE_MULTI_PROCESS);
         try {
             int xmlId = R.xml.class.getField(config + "_preferences")
