@@ -11,8 +11,15 @@ public class FxApplication extends Application {
 
     private RequestQueue mRequestQueue;
 
+    private static FxApplication mFxApplication = null;
+
+    public static FxApplication getFxApplication() {
+        return mFxApplication;
+    }
+
     @Override
     public void onCreate() {
+        mFxApplication = this;
         mRequestQueue = Volley.newRequestQueue(this);
     }
 
